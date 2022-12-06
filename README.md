@@ -11,7 +11,7 @@ A Python CLI based media player.
 1. Install 7zip if you haven't already, the install file is actively available in the repo files.
 2. Use 7zip to unzip `ffmpeg.7z`. This file is important as it is required in YT-DLP
 3. If you've cloned the repository or downloaded the source code itself, then open command prompt and type in `pip install yt-dlp` and `pip install pygame`. These are required.
-4. Run main.py
+4. Run `main.py`.
 
 # How to use
 1. Find a local or youtube audio file.
