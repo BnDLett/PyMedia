@@ -5,6 +5,7 @@ A Python CLI based media player.
 1. "Resume" doesn't work while playing an audio, meanwhile alternative does.
 2. Can not load local files.
 3. Audio thread potentionally not closing when it is supposed to.
+4. Audio not starting after queue is finished.
 
 # How to use
 1. Find a local or youtube audio file.
