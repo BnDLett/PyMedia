@@ -1,6 +1,8 @@
 # PyMedia
 A Python CLI based media player.
 
+**This project will be scrapped until I can find a better method of closing the audio thread.**
+
 # Already known issues
 1. "Resume" doesn't work while playing an audio, meanwhile alternative does.
 2. Can not load local files.
