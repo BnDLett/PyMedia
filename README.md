@@ -1,7 +1,7 @@
 # PyMedia
 A Python CLI based media player.
 
-**This project will be scrapped until I can find a better method of closing the audio thread.**
+<h3>This project will be scrapped until I can find a better method of closing the audio thread. <br>I will instead be moving on to my next project, which is similar to this but in Rust and with a GUI.</h3>
 
 # Already known issues
 1. "Resume" doesn't work while playing an audio, meanwhile alternative does.
