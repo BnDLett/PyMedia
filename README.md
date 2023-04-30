@@ -1,33 +1,37 @@
 # PyMedia
-A Python CLI based media player.
-
-<h3>This project will be scrapped until I can find a better method of closing the audio thread.</h3>
+A Python CLI/GUI based media player.
+If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue.
+Also yes I am aware of the formatting issue with the readme, Github didn't wanna while I was editing this.
 
 # Already known issues
-1. "Resume" doesn't work while playing an audio, meanwhile alternative does.
-2. Can not load local files.
-3. Audio thread potentionally not closing when it is supposed to.
-4. Audio not starting after queue is finished.
+1. Alsa shitting out a warning sometimes
 
 # How to install
-1. Install 7zip if you haven't already, the install file is actively available in the repo files.
+<h3>Windows</h3>
+1. Install 7zip if you haven't already, the install file is actively available in the repo files. <br>
 2. Use 7zip to unzip `ffmpeg.7z`. This file is important as it is required in YT-DLP
-3. If you've cloned the repository or downloaded the source code itself, then open command prompt and type in `pip install yt-dlp` and `pip install pygame`. These are required.
-4. Run `main.py`.
+<h3>Ubuntu</h3>
+1. Open your terminal application with ctrl+alt+t <br>
+2. Run `sudo apt install ffmpeg`
+<h3>Final</h3>
+(Follow the next steps only if you've downloaded/cloned the source code)<br>
+3. cd to project directory <br>
+4. Run `python3 -m pip install -r requirements.txt`
 
 # How to use
-1. Find a local or youtube audio file.
-2. Paste in the location. (ex. `start C:audios/media.mp3`; `start https://www.youtube.com/watch?v=dQw4w9WgXcQ`)
-3. Enjoy
+1. Get a youtube or soundcloud link, or generally anything youtube-dlp supports.
+2. Run `main.py`
+3. Type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`)
 
 # Media controls
-`start`: Loads an audio file from either local files or a youtube link. <br>
+`play`: Loads an audio file from either local files or a youtube link. (Aliases: `start`) <br>
 `pause`: Pauses the current audio. <br>
-`unpause`: Resume the current audio. (Alias: `Resume`) <br>
-`exit`: Exits out of the media player. <br>
-`current`: Displays current information of the currently playing audio. Shows current position in the audio and current volume.
+`unpause`: Resume the current audio. (Aliases: `resume`, `unpause`, `continue`) <br>
+`stop`: Stops playing the current soundtrack and moves on to the next one in queue. <br>
+`exit`: Exits out of the media player. (Aliases: `quit`, `leave`)
 
 # To do
-1. Check if the audio file already exists in the file system, if it does then play that.
-2. Convert the program to .exe for easier accessibility.
-3. Squash bugs and fix issues.
+1. Allow for user to select between keeping downloaded files or deleting them.
+2. Check if file is already downloaded.
+3. Allow for GUI usage of app.
+4. Compile app in to a `.exe`
