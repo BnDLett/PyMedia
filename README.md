@@ -6,7 +6,8 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 
 # Already known issues
 1. Alsa shitting out a warning sometimes
-2. Help command still unavailable (I forgot to add this during release of v1.1.0)
+2. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
+3. `exit` command doesn't exit fully when playing audio and will need to press ctrl+c in order to fully exit.
 
 # How to install
 <h3>Windows</h3>
