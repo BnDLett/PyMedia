@@ -21,17 +21,21 @@ global audio_process
 def download_audio(user_input: str):
     print("Loading audio... this may take a moment.")
 
-    if "https://" or "www" in user_input:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(user_input, False)
-            info = ydl.prepare_filename(info)
-            ydl.download([user_input])
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(user_input, False)
+        info = ydl.prepare_filename(info)
 
+        if info.endswith(".webm"):
+            info = info.replace(".webm", ".wav")
+        else:
+            info = info.replace(info[-4:], ".wav")
+        
+        print(os.listdir())
+        if info in os.listdir(): # This is for caching
+            print(os.listdir())
+            return info
+        ydl.download([user_input])
 
-    if info.endswith(".webm"):
-        info = info.replace(".webm", ".wav")
-    else:
-        info = info.replace(info[-4:], ".wav")
     return info
 
 def start_audio():
@@ -46,11 +50,13 @@ def start_audio():
             print(f"{colorama.Fore.RED}An error has occured:\n{exc}")
             pass
 
+        print(file)
+
         global audio_process
-        audio_wavobj = simpleaudio.WaveObject.from_wave_file(file)
+        audio_wavobj = simpleaudio.WaveObject.from_wave_file(file[0])
         audio_process = audio_wavobj.play()
         audio_process.wait_done()
-        os.remove(file)
+        if file[1]: os.remove(file)
 
 def attempt_clear():
     try:
@@ -65,15 +71,22 @@ def user_interface():
     audio_thread = False
 
     while True:
-        clear = True
+        clear = False
+        del_cache = False
         user_input = input("Please enter a command. Use help for a list of commands.\n> ").split(" ")
+
+        try:
+            if user_input[2] in ["-nocache", "-n"]:
+                del_cache = True
+        except:
+            pass
 
         if user_input[0].lower() in ["help", "-?"]:
             print("Help list is not yet ready.")
 
         elif user_input[0].lower() in ["play", "start", "queue"]:
             file_loc = download_audio(user_input[1]) 
-            audio_queue.put(file_loc)
+            audio_queue.put([file_loc, del_cache])
             if audio_thread == False:
                 audio_thread = threading.Thread(target = start_audio, name = "PyMedia Audio Player")
                 audio_thread.start()
