@@ -2,7 +2,7 @@ import yt_dlp, threading, queue, colorama, os, simpleaudio
 
 """
 PyMedia from Weebed-Coder
-Version 1.1.1
+Version 1.2.0
 """
 
 ydl_opts = {
