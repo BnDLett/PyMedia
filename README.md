@@ -1,7 +1,8 @@
 # PyMedia
-A Python CLI/GUI based media player.
-If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue.
-Also yes I am aware of the formatting issue with the readme, Github didn't wanna while I was editing this.
+A Python CLI/GUI based media player. <br>
+If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue. <br>
+Also yes I am aware of the formatting issue with the readme, Github didn't wanna while I was editing this. <br><br>
+<b>This is the dev branch, do expect bugs and debug information being shit out.</b>
 
 # Already known issues
 1. Alsa shitting out a warning sometimes
