@@ -1,8 +1,15 @@
-import yt_dlp, threading, queue, colorama, os, simpleaudio
+import yt_dlp, threading, queue, colorama, os, time, argparse
+import dearpygui.dearpygui as dpg
+from pygame import mixer
+
+mixer.init()
+
+version = "1.2.0a"
 
 """
 PyMedia from Weebed-Coder
-Version 1.2.0
+
+This is an alpha version of PyMedia 1.2.0, do expect bugs and missing features.
 """
 
 ydl_opts = {
@@ -40,6 +47,10 @@ Flags:
 """ # I understand this is bad practice however for now I'll keep it this way, simplifies the program. (aka am lazy to make a more convoluted solution)
 
 global audio_process
+global audio_queue
+global audio_thread
+audio_thread = False
+audio_queue = queue.Queue()
 
 def download_audio(user_input: str):
     print("Loading audio... this may take a moment.")
@@ -60,6 +71,7 @@ def download_audio(user_input: str):
     return info
 
 def start_audio():
+    global audio_thread
     while True:
         if audio_queue.empty():
             audio_thread = False
@@ -72,9 +84,15 @@ def start_audio():
             pass
 
         global audio_process
-        audio_wavobj = simpleaudio.WaveObject.from_wave_file(file[0])
-        audio_process = audio_wavobj.play()
-        audio_process.wait_done()
+        global paused
+        #audio_wavobj = simpleaudio.WaveObject.from_wave_file(file[0])
+        #audio_process = audio_wavobj.play()
+        #audio_process.wait_done()
+        tada = mixer.Sound(file[0])
+        audio_process = tada.play()
+        paused = False
+        while audio_process.get_busy():
+            time.sleep(0.1)
         if file[1]: os.remove(f"cache/{file}")
 
 def attempt_clear():
@@ -83,11 +101,18 @@ def attempt_clear():
     except Exception as hi_neko: # This is not tested on a windows machine yet.
         os.system("cls")
 
-def user_interface():
-    global audio_queue
+def prepare_and_play(sender = False, user_input: str = None, del_cache: bool = True):
+    if sender:
+        user_input = dpg.get_value("user_url")
+    print(user_input)
     global audio_thread
-    audio_queue = queue.Queue()
-    audio_thread = False
+    file_loc = download_audio(user_input) 
+    audio_queue.put([file_loc, del_cache])
+    if audio_thread == False:
+        audio_thread = threading.Thread(target = start_audio, name = "PyMedia Audio Player")
+        audio_thread.start()
+
+def user_interface():
 
     while True:
         clear = True
@@ -106,17 +131,13 @@ def user_interface():
             print(help_info)
 
         elif user_input[0].lower() in ["play", "start", "queue"]:
-            file_loc = download_audio(user_input[1]) 
-            audio_queue.put([file_loc, del_cache])
-            if audio_thread == False:
-                audio_thread = threading.Thread(target = start_audio, name = "PyMedia Audio Player")
-                audio_thread.start()
+            prepare_and_play(user_input = user_input[0], del_cache = del_cache)
 
         elif user_input[0].lower() in ["pause"]:
             audio_process.pause()
 
         elif user_input[0].lower() in ["continue", "resume", "unpause"]:
-            audio_process.resume()
+            audio_process.unpause()
 
         elif user_input[0].lower() in ["stop"]:
             audio_process.stop()
@@ -127,9 +148,54 @@ def user_interface():
         if clear:
             attempt_clear()
 
+def gui_interface():
+    def change_pause_state():
+        try:
+            global audio_process
+            global paused
+            if paused == False: 
+                audio_process.pause()
+                paused = True
+            else: 
+                audio_process.unpause()
+                paused = False
+        except Exception as err:
+            raise err
+    
+    def move_along_now():
+        audio_process.stop()
+
+    dpg.create_context()
+    dpg.create_viewport()
+
+    with dpg.window(label=f"PyMedia v{version}", tag="Primary Window"):
+        # Note: Will need to add a bottom border for :sparkles:style:sparkles:
+        with dpg.group(label="search_upper", horizontal=True):
+            user_url = dpg.add_input_text(label="URL", tag="user_url")
+            dpg.add_button(label="Confirm", callback = prepare_and_play)
+            
+        with dpg.group(label="main_middle"):
+            pass # This section will contain locally installed files that can use
+        with dpg.group(label="media_controls"):
+            with dpg.group(label="playback_control", horizontal=True):
+                dpg.add_button(label = "<") # Will need to round these out later when possible, also the button "<" will not work because there is no functionality for it yet
+                dpg.add_button(label = "||", callback = change_pause_state)
+                dpg.add_button(label = ">", callback = move_along_now)
+
+    dpg.create_viewport(title=f'PyMedia v{version}', width=600, height=200)
+    dpg.setup_dearpygui()
+    dpg.show_viewport()
+    dpg.set_primary_window("Primary Window", True)
+    dpg.start_dearpygui()
+    dpg.destroy_context()
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--gui", help="Change if the app boots with or without GUI.", type=bool)
     while True:
-        #try:
-        user_interface()
-        #except Exception as e:
-        #    print(f"{colorama.Fore.RED}An error has occured, if this error continues to occur then open an issue in the project github. Restarting interface.\n\nError:\n{e}{colorama.Fore.RESET}")
+        try:
+            args = parser.parse_args()
+            if args.gui: user_interface()
+            gui_interface()
+        except Exception as e:
+            print(f"{colorama.Fore.RED}An error has occured, if this error continues to occur then open an issue in the project github. Restarting interface.\n\nError:\n{e}{colorama.Fore.RESET}")
