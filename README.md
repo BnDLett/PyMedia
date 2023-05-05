@@ -24,7 +24,9 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 # How to use
 1. Get a youtube or soundcloud link, or generally anything youtube-dlp supports.
 2. Run `main.py`
-3. Type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`)
+3. Choose if you want to use gui with `--nogui` or `-ng`. Or, leave it blank to default to gui.
+4 (1/2). If you're using CLI, type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`)
+4 (2/2). If you're using GUI, type in your link in to the text box with "URL" next to it then press "confirm".
 
 # Media controls
 `play`: Loads an audio file from either local files or a youtube link. (Aliases: `start`) <br>
@@ -36,5 +38,5 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 # To do
 1. Allow for user to select between keeping downloaded files or deleting them.
 2. Check if file is already downloaded.
-3. Allow for GUI usage of app.
+3. Finish app GUI.
 4. Compile app in to a `.exe`
