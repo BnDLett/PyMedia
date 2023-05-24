@@ -1,7 +1,7 @@
 import yt_dlp, threading, queue, colorama, os, time, argparse
 import dearpygui.dearpygui as dpg
-from pygame import mixer
 
+from pygame import mixer
 mixer.init()
 
 version = "1.2.1a"
@@ -26,9 +26,9 @@ ydl_opts = {
 
 help_info = """
 Commands:
- play - Play an audio by link. 
+ play - Play an audio by link or search term. 
    Usage: play [link]
-   Aliases: start
+   Aliases: start, queue
  pause - Pause the currently playing audio.
    Usage: pause
  resume - Resumes the paused audio. Has no effect if audio isn't paused.
@@ -194,8 +194,11 @@ def gui_interface():
         except Exception as err:
             raise err
     
+    # These are here to bypass some issues in DearPyGUI
     def move_along_now():
         audio_process.stop()
+    def close_app(_sender, _data):
+        os._exit(0)
 
     dpg.create_context()
     dpg.create_viewport()
@@ -204,7 +207,8 @@ def gui_interface():
         # Note: Will need to add a bottom border for :sparkles:style:sparkles:
         with dpg.group(label="search_upper", horizontal=True):
             user_url = dpg.add_input_text(label="URL", tag="user_url")
-            dpg.add_button(label="Confirm", callback = prepare_and_play)
+            dpg.add_button(label="Confirm", callback=prepare_and_play)
+            dpg.add_button(label="Exit", callback=close_app) # This is here due to a minor issue in DearPyGUI
             
         with dpg.group(label="main_middle"):
             pass # This section will contain locally installed files that can use
