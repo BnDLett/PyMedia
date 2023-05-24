@@ -42,3 +42,4 @@ Quick note: You can now use a search term such as "Rick Astley - Never Gonna Giv
 3. Compile app in to a `.exe`
 4. Allow for going backwards in queue (this also allows one to loop in a queue).
 5. Clean everything up
+6. Debug logs to allow for easier debugging on the developers end. 
