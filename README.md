@@ -1,14 +1,20 @@
 # PyMedia
 A Python CLI/GUI based media player. <br>
-If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue. <br>
-Also yes I am aware of the formatting issue with the readme, Github didn't wanna while I was editing this. <br><br>
-<b>This is the dev branch, do expect bugs and debug information being shit out.</b>
+If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue. <br><br>
+<b>This is the dev branch, do expect bugs and debug information being printed out.</b>
 
 # Already known issues
 1. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
 2. `exit` command doesn't exit fully when playing audio and will need to press ctrl+c in order to fully exit. (?)
 
 # How to install
+<h3>Binaries</h3>
+1. Go to https://github.com/Weebed-Coder/PyMedia/releases/tag/v1.2.1a <br>
+2. Download the binary for your appropriate platform <br>
+3. (Optional) Move the binary to an appropriate folder <br>
+4. Run the binary.
+
+<h2>Installation from source</h2>
 <h3>Windows</h3>
 1. Install 7zip if you haven't already, the install file is actively available in the repo files. <br>
 2. Use 7zip to unzip `ffmpeg.7z`. This file is important as it is required in YT-DLP
@@ -39,7 +45,6 @@ Quick note: You can now use a search term such as "Rick Astley - Never Gonna Giv
 # To do
 1. Allow for user to select between keeping downloaded files or deleting them. (Currently implemented in CLI, still needs to be implemented in GUI)
 2. Finish app GUI.
-3. Compile app in to a `.exe`
-4. Allow for going backwards in queue (this also allows one to loop in a queue).
-5. Clean everything up
-6. Debug logs to allow for easier debugging on the developers end. 
+3. Allow for going backwards in queue (this also allows one to loop in a queue).
+4. Get rid of debug prints
+5. Debug logs to allow for easier debugging on the developers end. 
