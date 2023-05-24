@@ -4,7 +4,7 @@ from pygame import mixer
 
 mixer.init()
 
-version = "1.2.0a"
+version = "1.2.1a"
 
 """
 PyMedia from Weebed-Coder
@@ -15,11 +15,11 @@ This is an alpha version of PyMedia 1.2.0, do expect bugs and missing features.
 ydl_opts = {
     'format': 'bestaudio/best',
     'quiet': True,
-    'outtmpl': r"cache/%(title)s-%(id)s.%(ext)s",
-    "paths": {'wav':'cache', 'webm':'cache'},
+    'outtmpl': "cache/%(title)s-%(id)s.%(ext)s",
+    "paths": {'mp3':'cache', 'webm':'cache'},
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'wav',
+        'preferredcodec': 'mp3',
         'preferredquality': '192',
     }],
 }
@@ -44,7 +44,10 @@ Flags:
  -nocache - Will delete the .wav file once it is done playing, this is useful for when you're minimizing disk space usage.
    Usage: play [link] -nocache
    Aliases: -n
-""" # I understand this is bad practice however for now I'll keep it this way, simplifies the program. (aka am lazy to make a more convoluted solution)
+""" 
+# I understand this may be bad practice however for now I'll 
+# keep it this way, simplifies the program. (aka am 
+# too lazy to make a more convoluted solution)
 
 global audio_process
 global audio_queue
@@ -53,24 +56,42 @@ audio_thread = False
 audio_queue = queue.Queue()
 
 def download_audio(user_input: str):
+    """
+    Downloads audio using yt_dlp library
+    """
     print("Loading audio... this may take a moment.")
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        if user_input.startswith("https://") == False and user_input.startswith("www.") == False:
+            funny_dict = ydl.extract_info(f"ytsearch:{user_input}", download=False)['entries'][0]['id']
+            user_input = f"https://youtube.com/watch?v={funny_dict}"
+        elif user_input.startswith("http://"):
+            print("Visiting http websites is unsafe, please refrain from visiting websites using http and not https as they're insecure.")
+
         info = ydl.extract_info(user_input, False)
         info = ydl.prepare_filename(info)
 
+        print(info)
+
         if info.endswith(".webm"):
-            info = info.replace(".webm", ".wav")
+            info = info.replace(".webm", ".mp3")
         else:
-            info = info.replace(info[-4:], ".wav")
+            print(1)
+            info = info.replace(info[-4:], ".mp3")
         
-        if info.replace("cache/", "") in os.listdir("cache"): # This is for caches (if any)
+        print(info)
+
+        if os.path.exists(info): # This is for caches (if any)
             return info
         ydl.download([user_input])
 
     return info
 
 def start_audio():
+    """
+    Starts the audio thread, alongside handling removing items from queue.
+    """
+
     global audio_thread
     while True:
         if audio_queue.empty():
@@ -102,6 +123,10 @@ def attempt_clear():
         os.system("cls")
 
 def prepare_and_play(sender = False, user_input: str = None, del_cache: bool = True):
+    """
+    Prepares and plays the audio.
+    """
+
     if sender:
         user_input = dpg.get_value("user_url")
     print(user_input)
@@ -113,6 +138,9 @@ def prepare_and_play(sender = False, user_input: str = None, del_cache: bool = T
         audio_thread.start()
 
 def user_interface():
+    """
+    CLI user interface
+    """
 
     while True:
         clear = True
@@ -149,6 +177,10 @@ def user_interface():
             attempt_clear()
 
 def gui_interface():
+    """
+    GUI user interface
+    """
+
     def change_pause_state():
         try:
             global audio_process
@@ -188,6 +220,7 @@ def gui_interface():
     dpg.set_primary_window("Primary Window", True)
     dpg.start_dearpygui()
     dpg.destroy_context()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
