@@ -5,9 +5,8 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 <b>This is the dev branch, do expect bugs and debug information being shit out.</b>
 
 # Already known issues
-1. Alsa shitting out a warning sometimes
-2. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
-3. `exit` command doesn't exit fully when playing audio and will need to press ctrl+c in order to fully exit.
+1. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
+2. `exit` command doesn't exit fully when playing audio and will need to press ctrl+c in order to fully exit. (?)
 
 # How to install
 <h3>Windows</h3>
@@ -24,9 +23,11 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 # How to use
 1. Get a youtube or soundcloud link, or generally anything youtube-dlp supports.
 2. Run `main.py`
-3. Choose if you want to use gui with `--nogui` or `-ng`. Or, leave it blank to default to gui.
-4 (1/2). If you're using CLI, type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`)
-4 (2/2). If you're using GUI, type in your link in to the text box with "URL" next to it then press "confirm".
+3. Choose if you want to use gui with `--nogui` or `-ng`. Or, leave it blank to default to gui. <br>
+4. (1/2) If you're using CLI, type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`) <br>
+(2/2) If you're using GUI, type in your link in to the text box with "URL" next to it then press "confirm". <br>
+
+Quick note: You can now use a search term such as "Rick Astley - Never Gonna Give You Up" on both CLI and GUI.
 
 # Media controls
 `play`: Loads an audio file from either local files or a youtube link. (Aliases: `start`) <br>
@@ -36,7 +37,8 @@ Also yes I am aware of the formatting issue with the readme, Github didn't wanna
 `exit`: Exits out of the media player. (Aliases: `quit`, `leave`)
 
 # To do
-1. Allow for user to select between keeping downloaded files or deleting them.
-2. Check if file is already downloaded.
-3. Finish app GUI.
-4. Compile app in to a `.exe`
+1. Allow for user to select between keeping downloaded files or deleting them. (Currently implemented in CLI, still needs to be implemented in GUI)
+2. Finish app GUI.
+3. Compile app in to a `.exe`
+4. Allow for going backwards in queue (this also allows one to loop in a queue).
+5. Clean everything up
