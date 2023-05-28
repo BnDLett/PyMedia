@@ -48,3 +48,4 @@ Quick note: You can now use a search term such as "Rick Astley - Never Gonna Giv
 3. Allow for going backwards in queue (this also allows one to loop in a queue).
 4. Get rid of debug prints
 5. Debug logs to allow for easier debugging on the developers end. 
+6. Add a status text for progress of download.
