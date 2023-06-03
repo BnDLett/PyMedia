@@ -41,11 +41,3 @@ Quick note: You can now use a search term such as "Rick Astley - Never Gonna Giv
 `unpause`: Resume the current audio. (Aliases: `resume`, `unpause`, `continue`) <br>
 `stop`: Stops playing the current soundtrack and moves on to the next one in queue. <br>
 `exit`: Exits out of the media player. (Aliases: `quit`, `leave`)
-
-# To do
-1. Allow for user to select between keeping downloaded files or deleting them. (Currently implemented in CLI, still needs to be implemented in GUI)
-2. Finish app GUI.
-3. Allow for going backwards in queue (this also allows one to loop in a queue).
-4. Get rid of debug prints
-5. Debug logs to allow for easier debugging on the developers end. 
-6. Add a status text for progress of download.
