@@ -96,7 +96,7 @@ def start_audio():
     while True:
         if audio_queue.empty():
             audio_thread = False
-            exit()
+            return
 
         try:
             file = audio_queue.get()
@@ -159,7 +159,7 @@ def user_interface():
             print(help_info)
 
         elif user_input[0].lower() in ["play", "start", "queue"]:
-            prepare_and_play(user_input = user_input[0], del_cache = del_cache)
+            prepare_and_play(user_input = user_input[1], del_cache = del_cache)
 
         elif user_input[0].lower() in ["pause"]:
             audio_process.pause()
