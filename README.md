@@ -1,38 +1,42 @@
 # PyMedia
-A Python CLI/GUI based media player.
-If you have any suggestions on how to improve the code or repeatedly run in to an error then please open an issue.
-Also yes I am aware of the formatting issue with the readme, Github didn't wanna while I was editing this.
+A Python based CLI and GUI media player. <br>
+Feel free to open an issue for bugs, glitches, or suggestions. <br><br>
+<b>This is a dev branch, you may run into bugs.</b>
 
 # Already known issues
-1. Alsa shitting out a warning sometimes
-2. Help command still unavailable (I forgot to add this during release of v1.1.0)
+1. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
+2. `exit` command doesn't exit fully when playing audio and will need to press ctrl+c in order to fully exit. (?)
 
 # How to install
-<h3>Windows</h3>
-1. Install 7zip if you haven't already, the install file is actively available in the repo files. <br>
-2. Use 7zip to unzip `ffmpeg.7z`. This file is important as it is required in YT-DLP
-<h3>Ubuntu</h3>
-1. Open your terminal application with ctrl+alt+t <br>
+### Binaries
+1. Go to <a href="https://github.com/BnDLett/PyMedia/releases/tag/v1.3.0a">PyMedia v1.3.0a pre-release</a> (or whatever version suits you best).
+2. Download the binary for your platform.
+3. (Recommended) Move the binary to an appropriate folder.
+4. Run the binary.
+
+## Installation from source
+### Windows
+1. Install 7zip if you haven't already, the install file is actively available in the repo files.
+2. Use 7zip to unzip `ffmpeg.7z`. This file is required for YT-DLP.
+### Ubuntu
+1. Open your terminal application with ctrl+alt+t.
 2. Run `sudo apt install ffmpeg`
-<h3>Final</h3>
-(Follow the next steps only if you've downloaded/cloned the source code)<br>
-3. cd to project directory <br>
+### Final
+(Follow the next steps only if you've downloaded/cloned the source code)
+3. cd to project directory in the terminal.
 4. Run `python3 -m pip install -r requirements.txt`
+5. Run `python3 main.py`
 
 # How to use
-1. Get a youtube or soundcloud link, or generally anything youtube-dlp supports.
+1. Get a link that YT-DLP supports (YouTube, TikTok, Soundcloud, etc.).
 2. Run `main.py`
-3. Type in "play " and then paste in your link. (Example: `start https://youtu.be/dQw4w9WgXcQ`)
+3. Choose if you want to use CLI with `--nogui` or `-ng`. You can also leave it blank to default to the GUI.
+4. (1/2) CLI: Type in `[either start or play] [link or search term]`. (Example: `start https://youtu.be/dQw4w9WgXcQ`) <br>
+   (2/2) GUI: Enter the link or search term into the text box and press "enter."
 
 # Media controls
-`play`: Loads an audio file from either local files or a youtube link. (Aliases: `start`) <br>
+`play`: Loads an audio file from either local files (not yet supported), a search term, or a supported link. (Aliases: `start`) <br>
 `pause`: Pauses the current audio. <br>
 `unpause`: Resume the current audio. (Aliases: `resume`, `unpause`, `continue`) <br>
 `stop`: Stops playing the current soundtrack and moves on to the next one in queue. <br>
 `exit`: Exits out of the media player. (Aliases: `quit`, `leave`)
-
-# To do
-1. Allow for user to select between keeping downloaded files or deleting them.
-2. Check if file is already downloaded.
-3. Allow for GUI usage of app.
-4. Compile app in to a `.exe`
