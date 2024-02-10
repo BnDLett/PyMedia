@@ -1,7 +1,7 @@
 # PyMedia
 A Python based CLI and GUI media player. <br>
 Feel free to open an issue for bugs, glitches, or suggestions. <br><br>
-<b>This is a dev branch, you may run into bugs.</b>
+<b>This is a beta branch, you may run into bugs.</b>
 
 # Already known issues
 1. ValueError upon trying to use any command directly after queue is empty. (Actual cause is not 100% known)
