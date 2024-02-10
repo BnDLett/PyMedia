@@ -7,13 +7,16 @@ class Queue:
     in_queue = []
     left_queue = []
 
-    def __init__(self, initial_queue=None):
+    def __init__(self, initial_queue: list | None = None):
         if initial_queue is None:
             initial_queue = []
+
         self.in_queue = initial_queue
+        self.left_queue = []
 
     def __len__(self, iterable: list | dict | tuple | str):
-        len(iterable)
+        result = len(iterable)
+        return result
 
     def get_next_item(self, remove: bool = True) -> any:
         """
@@ -55,12 +58,15 @@ class Queue:
 
         self.in_queue.append(value)
 
-    def empty(self) -> bool:
+    def empty(self, debug: bool = False) -> bool:
         """
         :return: If the audio queue is empty or not
         """
 
-        return self.__len__(self.in_queue) == 0
+        result = self.__len__(self.in_queue) == 0
+        if debug:
+            print(self.__len__(self.in_queue))
+        return result
 
     def empty_previous(self) -> bool:
         """
@@ -68,6 +74,15 @@ class Queue:
         """
 
         return self.__len__(self.in_queue) == 0
+
+    def get_total(self) -> list:
+        """
+        Combines both previous and current queue and returns it.
+        :return: Previous and currently queue combined
+        """
+        total_queue = self.left_queue
+        total_queue.extend(self.in_queue)
+        return total_queue
 
 
 if __name__ == "__main__":

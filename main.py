@@ -1,3 +1,4 @@
+import platform
 import sys
 
 import argparse
@@ -13,7 +14,7 @@ from letts_utils import queue
 
 mixer.init()
 
-version = "1.4.0a"
+version = "1.5.0a"
 
 colorama.init(True)
 print(f"{colorama.Back.YELLOW}Halt! This is a dev release, expect bugs and incomplete features. Current version is "
@@ -56,9 +57,12 @@ Flags:
 global audio_process
 global audio_queue
 global audio_thread
+global paused
+global file
 audio_process = mixer.Channel
-audio_thread = False
 audio_queue = queue.Queue()
+audio_thread = False
+paused = False
 
 
 def download_audio(link: str):
@@ -117,9 +121,6 @@ def start_audio():
 
         global audio_process
         global paused
-        # audio_wavobj = simpleaudio.WaveObject.from_wave_file(file[0])
-        # audio_process = audio_wavobj.play()
-        # audio_process.wait_done()
         tada = mixer.Sound(file[0])
         audio_process = tada.play()
         paused = False
@@ -133,12 +134,22 @@ def start_audio():
 def attempt_clear():
     """
     Attempts to clear the terminal. Does not work for macOS.
-    :return:
+    :return: Nothing
     """
-    try:
+
+    if platform.system() == "Linux":
         os.system("clear")
-    except Exception as hi_neko:  # This is not tested on a Windows machine yet.
-        os.system("cls")
+        return
+    os.system("cls")
+
+
+def empty_cache():
+    result = audio_queue.get_total()
+    for file in result:
+        if not file[1]:
+            continue
+
+        os.remove(f"{file[0]}")
 
 
 def prepare_and_play(link: str = None, del_cache: bool = True):
@@ -193,7 +204,8 @@ def user_interface():
             audio_process.stop()
 
         elif user_input[0].lower() in ["quit", "exit", "leave"]:
-            exit()
+            empty_cache()
+            os._exit(0)
 
         if clear:
             attempt_clear()
@@ -232,6 +244,10 @@ class GUIInterface(QMainWindow):
         enter.clicked.connect(self.run_audio)
         enter.setGeometry((self.link.x() + self.link.width()) + self.spacing, self.link.y(), 50, self.link.height())
 
+        self.delete_cache = QCheckBox("Delete cache", self)
+        self.delete_cache.setGeometry((enter.x() + enter.width()) + self.spacing, enter.y(), enter.width()+2,
+                                      enter.height())
+
         self.previous_btn = QPushButton("Previous", self)
         self.previous_btn.clicked.connect(previous_in_queue)
         self.previous_btn.setGeometry(self.link.x(), (self.link.y() + self.link.height()) + self.spacing, 70,
@@ -248,8 +264,10 @@ class GUIInterface(QMainWindow):
         self.skip_btn.setGeometry((self.pause_play.x() + self.pause_play.width()) + self.spacing, self.pause_play.y(),
                                   self.pause_play.width(), self.pause_play.height())
 
-        self.pause_play.setDisabled(audio_queue.empty())
-        self.skip_btn.setDisabled(audio_queue.empty())
+        disabled = audio_queue.empty()
+        self.previous_btn.setDisabled(disabled)
+        self.pause_play.setDisabled(disabled)
+        self.skip_btn.setDisabled(disabled)
 
     def change_pause_state(self):
         if not self.__paused__:
@@ -266,8 +284,10 @@ class GUIInterface(QMainWindow):
         :return:
         """
         import threading  # Ensures threading is imported
-        thread = threading.Thread(target=prepare_and_play, args=(self.link.text(),))
+        thread = threading.Thread(target=prepare_and_play, args=(self.link.text(), self.delete_cache.isChecked()))
         thread.start()
+
+        self.previous_btn.setDisabled(False)
         self.pause_play.setDisabled(False)
         self.skip_btn.setDisabled(False)
 
@@ -278,14 +298,22 @@ if __name__ == "__main__":
 
     try:
         args = parser.parse_args()
-        if args.gui: user_interface()
+        if args.gui:
+            user_interface()
 
         App = QApplication(sys.argv)
         window = GUIInterface(version)
         window.show()
-        os._exit(App.exec())
+
+        exit_code = App.exec()
+        empty_cache()
+        os._exit(exit_code)
+
     except Exception as e:
         print(
             f"{colorama.Fore.RED}An error has occurred, if this error continues to occur then open an issue in the "
             f"project github.\n\nError:\n{e}{colorama.Fore.RESET}")
         raise e
+
+    finally:
+        empty_cache()
