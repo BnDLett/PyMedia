@@ -14,7 +14,7 @@ from letts_utils import queue
 
 mixer.init()
 
-version = "1.5.0a"
+version = "1.5.1b"
 
 colorama.init(True)
 print(f"{colorama.Back.YELLOW}Halt! This is a dev release, expect bugs and incomplete features. Current version is "
