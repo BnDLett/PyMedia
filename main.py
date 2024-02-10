@@ -1,13 +1,23 @@
 import sys
 
-import yt_dlp, threading, queue, colorama, os, time, argparse
+import argparse
+import colorama
+import os
+import threading
+import time
+import yt_dlp
 from PyQt6.QtWidgets import *
-
 from pygame import mixer
+
+from letts_utils import queue
 
 mixer.init()
 
-version = "1.3.0a"
+version = "1.4.0a"
+
+colorama.init(True)
+print(f"{colorama.Back.YELLOW}Halt! This is a dev release, expect bugs and incomplete features. Current version is "
+      f"{version}.")
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -93,14 +103,14 @@ def start_audio():
     :return:
     """
 
-    global audio_thread
+    global audio_thread, file
     while True:
         if audio_queue.empty():
             audio_thread = False
             return
 
         try:
-            file = audio_queue.get()
+            file = audio_queue.get_next_item()
         except Exception as exc:
             print(f"{colorama.Fore.RED}An error has occured:\n{exc}")
             pass
@@ -115,7 +125,9 @@ def start_audio():
         paused = False
         while audio_process.get_busy():
             time.sleep(0.1)
-        if file[1]: os.remove(f"{file[0]}")
+        # if file[1]:
+        #     os.remove(f"{file[0]}")
+        # TODO: Reimplement this in a manner that supports queuing. This will be implemented in v1.5.0a
 
 
 def attempt_clear():
@@ -140,7 +152,7 @@ def prepare_and_play(link: str = None, del_cache: bool = True):
     print(link)
     global audio_thread
     file_loc = download_audio(link)
-    audio_queue.put([file_loc, del_cache])
+    audio_queue.append_to_queue([file_loc, del_cache])
     if not audio_thread:
         audio_thread = threading.Thread(target=start_audio, name="PyMedia Audio Player")
         audio_thread.start()
@@ -169,7 +181,7 @@ def user_interface():
             print(help_info)
 
         elif user_input[0].lower() in ["play", "start", "queue"]:
-            prepare_and_play(user_input=user_input[1], del_cache=del_cache)
+            prepare_and_play(link=user_input[1], del_cache=del_cache)
 
         elif user_input[0].lower() in ["pause"]:
             audio_process.pause()
@@ -187,13 +199,18 @@ def user_interface():
             attempt_clear()
 
 
+def previous_in_queue():
+    audio_process.stop()
+    audio_queue.get_previous_items(True)
+
+
 class GUIInterface(QMainWindow):
     """
     GUI interface
     :return:
     """
 
-    def __init__(self, version):
+    def __init__(self, program_version):
         super().__init__()
 
         global audio_process
@@ -202,7 +219,7 @@ class GUIInterface(QMainWindow):
 
         self.__audio_process__ = audio_process
         self.__paused__ = paused
-        self.__version__ = version
+        self.__version__ = program_version
         self.spacing = 5
 
         self.setWindowTitle(f"PyMedia {self.__version__}")
@@ -215,21 +232,22 @@ class GUIInterface(QMainWindow):
         enter.clicked.connect(self.run_audio)
         enter.setGeometry((self.link.x() + self.link.width()) + self.spacing, self.link.y(), 50, self.link.height())
 
-        previous_btn = QPushButton("Previous", self)
-        previous_btn.setGeometry(self.link.x(), (self.link.y() + self.link.height()) + self.spacing, 70,
-                                 self.link.height())
+        self.previous_btn = QPushButton("Previous", self)
+        self.previous_btn.clicked.connect(previous_in_queue)
+        self.previous_btn.setGeometry(self.link.x(), (self.link.y() + self.link.height()) + self.spacing, 70,
+                                      self.link.height())
 
         self.pause_play = QPushButton("Pause/Play", self)
         self.pause_play.clicked.connect(self.change_pause_state)
-        self.pause_play.setGeometry((previous_btn.x() + previous_btn.width()) + self.spacing, previous_btn.y(),
-                               previous_btn.width(), previous_btn.height())
+        self.pause_play.setGeometry((self.previous_btn.x() + self.previous_btn.width()) + self.spacing,
+                                    self.previous_btn.y(),
+                                    self.previous_btn.width(), self.previous_btn.height())
 
         self.skip_btn = QPushButton("Skip", self)
         self.skip_btn.clicked.connect(lambda: audio_process.stop())
         self.skip_btn.setGeometry((self.pause_play.x() + self.pause_play.width()) + self.spacing, self.pause_play.y(),
-                             self.pause_play.width(), self.pause_play.height())
+                                  self.pause_play.width(), self.pause_play.height())
 
-        previous_btn.setDisabled(True)
         self.pause_play.setDisabled(audio_queue.empty())
         self.skip_btn.setDisabled(audio_queue.empty())
 
@@ -237,9 +255,10 @@ class GUIInterface(QMainWindow):
         if not self.__paused__:
             audio_process.pause()
             self.__paused__ = True
-        else:
-            audio_process.unpause()
-            self.__paused__ = False
+            return
+
+        audio_process.unpause()
+        self.__paused__ = False
 
     def run_audio(self):
         """
@@ -269,3 +288,4 @@ if __name__ == "__main__":
         print(
             f"{colorama.Fore.RED}An error has occurred, if this error continues to occur then open an issue in the "
             f"project github.\n\nError:\n{e}{colorama.Fore.RESET}")
+        raise e
