@@ -17,8 +17,10 @@ mixer.init()
 version = "1.5.1b"
 
 colorama.init(True)
-print(f"{colorama.Back.YELLOW}Halt! This is a dev release, expect bugs and incomplete features. Current version is "
-      f"{version}.")
+
+if version[-1] in ['a', 'b', 'd']:
+    print(f"{colorama.Back.YELLOW}Halt! This is an unstable release, expect bugs and incomplete features. Current "
+          f"version is {version}.")
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -52,17 +54,22 @@ Flags:
  -nocache - Will delete the .wav file once it is done playing, this is useful for when you're minimizing disk space usage.
    Usage: play [link] -nocache
    Aliases: -n
-"""  # I understand this may be bad practice however for now I'll keep it this way, it simplifies the program.
+"""  # TODO: Move this to a dedicated file.
 
 global audio_process
 global audio_queue
 global audio_thread
 global paused
 global file
+global current_progress_ms
+global audio_sound
+
 audio_process = mixer.Channel
 audio_queue = queue.Queue()
 audio_thread = False
 paused = False
+current_progress_ms = 0
+audio_sound = mixer.Sound("cache/sample.mp3")  # TODO: Remove copyrighted song
 
 
 def download_audio(link: str):
@@ -74,12 +81,9 @@ def download_audio(link: str):
     print("Loading audio... this may take a moment.")
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        if link.startswith("https://") == False and link.startswith("www.") == False:
+        if not link.startswith("https://") and not link.startswith("www."):
             funny_dict = ydl.extract_info(f"ytsearch:{link}", download=False)['entries'][0]['id']
             link = f"https://youtube.com/watch?v={funny_dict}"
-        elif link.startswith("http://"):
-            print("Visiting http websites is unsafe, please refrain from visiting websites using http and not https as "
-                  "they're insecure.")
 
         info = ydl.extract_info(link, False)
         info = ydl.prepare_filename(info)
@@ -116,19 +120,20 @@ def start_audio():
         try:
             file = audio_queue.get_next_item()
         except Exception as exc:
-            print(f"{colorama.Fore.RED}An error has occured:\n{exc}")
+            print(f"{colorama.Fore.RED}An error has occurred:\n{exc}")
             pass
 
         global audio_process
         global paused
-        tada = mixer.Sound(file[0])
-        audio_process = tada.play()
+        global current_progress_ms
+        global audio_sound
+
+        audio_sound = mixer.Sound(file[0])
+        current_progress_ms = time.time() * 1000
+        audio_process = audio_sound.play()
         paused = False
         while audio_process.get_busy():
             time.sleep(0.1)
-        # if file[1]:
-        #     os.remove(f"{file[0]}")
-        # TODO: Reimplement this in a manner that supports queuing. This will be implemented in v1.5.0a
 
 
 def attempt_clear():
@@ -180,11 +185,8 @@ def user_interface():
         del_cache = False
         user_input = input("Please enter a command. Use help for a list of commands.\n> ").split(" ")
 
-        try:
-            if user_input[2] in ["-nocache", "-n"]:
-                del_cache = True
-        except:
-            pass
+        if user_input[2] in ["-nocache", "-n"]:
+            del_cache = True
 
         if user_input[0].lower() in ["help", "-?"]:
             attempt_clear()
@@ -245,7 +247,7 @@ class GUIInterface(QMainWindow):
         enter.setGeometry((self.link.x() + self.link.width()) + self.spacing, self.link.y(), 50, self.link.height())
 
         self.delete_cache = QCheckBox("Delete cache", self)
-        self.delete_cache.setGeometry((enter.x() + enter.width()) + self.spacing, enter.y(), enter.width()+2,
+        self.delete_cache.setGeometry((enter.x() + enter.width()) + self.spacing, enter.y(), enter.width() + 2,
                                       enter.height())
 
         self.previous_btn = QPushButton("Previous", self)
@@ -263,6 +265,10 @@ class GUIInterface(QMainWindow):
         self.skip_btn.clicked.connect(lambda: audio_process.stop())
         self.skip_btn.setGeometry((self.pause_play.x() + self.pause_play.width()) + self.spacing, self.pause_play.y(),
                                   self.pause_play.width(), self.pause_play.height())
+
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setGeometry(self.previous_btn.x(), (self.skip_btn.y() + self.link.height() + self.spacing),
+                                      self.link.width(), self.link.height())
 
         disabled = audio_queue.empty()
         self.previous_btn.setDisabled(disabled)
@@ -287,9 +293,25 @@ class GUIInterface(QMainWindow):
         thread = threading.Thread(target=prepare_and_play, args=(self.link.text(), self.delete_cache.isChecked()))
         thread.start()
 
+        thread2 = threading.Thread(target=self.update_progress_bar)
+        thread2.start()
+
         self.previous_btn.setDisabled(False)
         self.pause_play.setDisabled(False)
         self.skip_btn.setDisabled(False)
+
+    def update_progress_bar(self): # TODO: Make this actually work (it doesn't!!!!)
+        while True:
+            try:
+                audio_process.get_busy(audio_process)
+                break
+            except:
+                continue
+
+        while audio_process.get_busy(audio_process):
+            progress_percent = current_progress_ms / (audio_sound.get_length() * 1000)
+            self.progress_bar.setValue(int(progress_percent * 100))
+
 
 
 if __name__ == "__main__":
