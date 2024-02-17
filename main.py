@@ -14,7 +14,7 @@ from letts_utils import queue
 
 mixer.init()
 
-version = "1.5.1b"
+version = "1.6.0d"
 
 colorama.init(True)
 
